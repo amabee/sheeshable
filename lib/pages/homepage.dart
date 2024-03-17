@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sheeshable/pages/home.dart';
+import 'package:sheeshable/pages/search.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -13,9 +14,7 @@ class _HomePageState extends State<HomePage> {
 
   final List<Widget> _childrenPage = [
     Home(),
-    Center(
-      child: Text("Search"),
-    ),
+    SearchPage(),
     Center(
       child: Text("New Post"),
     ),

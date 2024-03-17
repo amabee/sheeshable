@@ -110,10 +110,7 @@ class _AuthenticationState extends State<Authentication> {
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Image.asset(
-                      'assets/name_logo.png',
-                      height: deviseWidth * .30,
-                    ),
+                    Text("Sheeshable", style: TextStyle(fontSize: 55, fontFamily: "FSP-BOLD"),),
                     SizedBox(
                       height: deviseWidth * .05,
                     ),

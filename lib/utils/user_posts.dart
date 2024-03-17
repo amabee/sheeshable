@@ -63,7 +63,7 @@ class UserPosts extends StatelessWidget {
         ),
 
         // COMMENTS
-        Padding(
+        const Padding(
           padding: const EdgeInsets.only(left: 16.0),
           child: Row(
             children: [

@@ -57,6 +57,7 @@ class _HomeState extends State<Home> {
             },
           ),
         ),
+        const Divider(),
         Expanded(
           child: ListView.builder(
               itemCount: people.length,
