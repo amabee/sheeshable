@@ -7,6 +7,7 @@ class UserPosts extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.all(16.0),
@@ -38,7 +39,7 @@ class UserPosts extends StatelessWidget {
         ),
         // post
         Container(
-          height: 300,
+          height: 400,
           color: Colors.grey[300],
         ),
         const Padding(
@@ -79,6 +80,27 @@ class UserPosts extends StatelessWidget {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ],
+          ),
+        ),
+
+        // CAPTION
+        Padding(
+          padding: const EdgeInsets.only(left: 16.0, top: 8.0),
+          child: RichText(
+            text: TextSpan(
+              style: TextStyle(color: Colors.black),
+              children: [
+                TextSpan(
+                  text: name,
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                TextSpan(text: " "),
+                TextSpan(
+                  text:
+                      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut egestas, purus non suscipit rutrum, nulla lacus consectetur mauris, at congue lacus dui sed quam. Praesent condimentum condimentum purus id fringilla. Etiam tempor justo vitae tincidunt cursus. Maecenas vestibulum sit amet ante vitae ultrices.",
+                )
+              ],
+            ),
           ),
         ),
       ],

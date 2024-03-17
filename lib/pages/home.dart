@@ -26,6 +26,7 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        forceMaterialTransparency: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: const Row(
@@ -56,7 +57,13 @@ class _HomeState extends State<Home> {
             },
           ),
         ),
-        const UserPosts(name: "Paul Sho"),
+        Expanded(
+          child: ListView.builder(
+              itemCount: people.length,
+              itemBuilder: (context, index) {
+                return UserPosts(name: people[index]);
+              }),
+        )
       ]),
     );
   }
