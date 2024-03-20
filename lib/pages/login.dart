@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sheeshable/functions/authentication_controller.dart';
 import 'package:sheeshable/pages/signup.dart';
 
 class StringsEn {
@@ -29,6 +30,13 @@ class Authentication extends StatefulWidget {
 }
 
 class _AuthenticationState extends State<Authentication> {
+  @override
+  void dispose() {
+    usernameController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
   String dropdownValue = 'English';
 
   TextEditingController usernameController = TextEditingController();
@@ -66,6 +74,8 @@ class _AuthenticationState extends State<Authentication> {
         loginText = StringsEn.login;
         forgotDetailsText = StringsEn.forgotDetails;
     }
+
+    bool isLoading = false;
 
     return Scaffold(
       body: SafeArea(
@@ -110,7 +120,10 @@ class _AuthenticationState extends State<Authentication> {
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("Sheeshable", style: TextStyle(fontSize: 55, fontFamily: "FSP-BOLD"),),
+                    const Text(
+                      "Sheeshable",
+                      style: TextStyle(fontSize: 55, fontFamily: "FSP-BOLD"),
+                    ),
                     SizedBox(
                       height: deviseWidth * .05,
                     ),
@@ -198,9 +211,14 @@ class _AuthenticationState extends State<Authentication> {
                               });
                             },
                             onTap: () {
-                              print('Log In');
+                              setState(() {
+                                isLoading = true;
+                              });
+                              login(usernameController.text,
+                                  passwordController.text, context);
+                             
                             },
-                            child: Container(
+                            child:Container(
                               width: deviseWidth * .90,
                               height: deviseWidth * .14,
                               decoration: BoxDecoration(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sheeshable/functions/authentication_controller.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({Key? key});
@@ -34,6 +35,7 @@ class _SignUpState extends State<SignUp> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController fullNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
+  TextEditingController phoneNumberController = TextEditingController();
 
   int buttonColor = 0xff26A9FF;
 
@@ -243,6 +245,41 @@ class _SignUpState extends State<SignUp> {
                                 }
                               });
                             },
+                            controller: phoneNumberController,
+                            style: TextStyle(
+                              fontSize: deviseWidth * .040,
+                            ),
+                            decoration: const InputDecoration.collapsed(
+                              hintText: 'Phone Number',
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: deviseWidth * .04,
+                    ),
+                    Container(
+                      width: deviseWidth * .90,
+                      height: deviseWidth * .14,
+                      decoration: const BoxDecoration(
+                        color: Color(0xffE8E8E8),
+                        borderRadius: BorderRadius.all(Radius.circular(5)),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        child: Center(
+                          child: TextField(
+                            onChanged: (text) {
+                              setState(() {
+                                if (usernameController.text.length >= 2 &&
+                                    passwordController.text.length >= 2) {
+                                  inputTextNotNull = true;
+                                } else {
+                                  inputTextNotNull = false;
+                                }
+                              });
+                            },
                             controller: passwordController,
                             obscureText: true,
                             style: TextStyle(
@@ -271,7 +308,13 @@ class _SignUpState extends State<SignUp> {
                               });
                             },
                             onTap: () {
-                              print('Sign Up');
+                              signup(
+                                  fullNameController.text,
+                                  usernameController.text,
+                                  emailController.text,
+                                  passwordController.text,
+                                  phoneNumberController.text,
+                                  context);
                             },
                             child: Container(
                               width: deviseWidth * .90,
@@ -365,7 +408,7 @@ class _SignUpState extends State<SignUp> {
                           ),
                           GestureDetector(
                             onTap: () {
-                             Navigator.pop(context);
+                              Navigator.pop(context);
                             },
                             child: Text(
                               'Log In',
