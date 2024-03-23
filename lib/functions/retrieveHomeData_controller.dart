@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:sheeshable/utils/url.dart';
 
@@ -19,9 +20,11 @@ Future<List> getPosts(String follower_id) async {
     if (response.statusCode == 200) {
       var result = jsonDecode(response.body);
       if (result is List && result.isNotEmpty) {
+        // print("Result: $result");
         return result;
       } else {
-        print("Error Retrieving Posts: ${response.body}");
+        //print("Error Retrieving Posts: ${response.body}");
+        const CircularProgressIndicator();
         return [];
       }
     } else {
@@ -62,4 +65,3 @@ Future<List> getFollowers(String follower_id) async {
     return [];
   }
 }
-

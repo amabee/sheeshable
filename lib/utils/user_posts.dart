@@ -1,7 +1,10 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:sheeshable/functions/getlikes.dart';
+import 'package:sheeshable/functions/likes_controller.dart';
 import 'package:sheeshable/models/LikedPost.dart';
+import 'package:sheeshable/utils/bottom_modal_sheet.dart';
 import 'package:sheeshable/utils/url.dart';
 
 class UserPosts extends StatefulWidget {
@@ -27,38 +30,54 @@ class UserPosts extends StatefulWidget {
 class _UserPostsState extends State<UserPosts> {
   bool isLiked = false;
   int likeCount = 0;
+  LikeData likeData = LikeData();
+
+  String likeMessage = "";
 
   @override
   void initState() {
     super.initState();
-    checkIfLiked();
+    getAllLike();
   }
 
-  Future<void> checkIfLiked() async {
-  try {
-    final box = await Hive.openBox('myBox');
-    final username = box.get("username");
-    final likedPosts = await getLikes(username, widget.postId);
+  void getAllLike() async {
+    final box = await Hive.openBox("myBox");
+    Map<String, dynamic>? likedData =
+        await getLikes(box.get("username"), widget.postId);
 
-    final isUserLiked = likedPosts.isNotEmpty;
-    final totalLikeData = likedPosts.fold<LikeData>(
-      LikeData(postId: widget.postId, likeCount: 0.toString()),
-      (previousValue, element) => LikeData(
-        postId: element.postId,
-        likeCount: previousValue.likeCount + element.likeCount,
-      ),
-    );
+    if (likedData != null && likedData.containsKey('post_id')) {
+      setState(() {
+        likeCount = likedData['total_like_count'];
+        isLiked = (likedData['user_like_count'] == "1");
 
-    setState(() {
-      isLiked = isUserLiked;
-      likeCount = int.tryParse(totalLikeData.likeCount).toString() as int;
-    });
-  } catch (error) {
-    print("Error checking if liked: $error");
-    // Handle error or show a toast/snackbar
+        updateLikeMessage();
+      });
+    }
   }
-}
 
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+
+    if (!isLiked) {
+      setState(() {
+        likeMessage = "You liked this post";
+      });
+    }
+  }
+
+  void updateLikeMessage() {
+    if (isLiked && likeCount == 1) {
+      likeMessage = "You Liked This Post";
+    } else if (isLiked && likeCount > 1) {
+      likeMessage = "You and ${likeCount - 1} others";
+    } else if (!isLiked && likeCount > 1) {
+      likeMessage = "${likeCount - 1} people liked this post";
+    } else {
+      likeMessage = "";
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +109,7 @@ class _UserPostsState extends State<UserPosts> {
                           : null,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 8,
                   ),
                   // USER NAME
@@ -129,18 +148,38 @@ class _UserPostsState extends State<UserPosts> {
                       size: 30.0,
                       color: isLiked ? Colors.red : null,
                     ),
-                    onTap: () {
-                      // Toggle like status
+                    onTap: () async {
+                      final box = await Hive.openBox("myBox");
                       setState(() {
                         isLiked = !isLiked;
+                        updateLikeMessage();
+                        if (isLiked) {
+                          likeMessage = "You liked this post";
+                          likePost(widget.postId, box.get("username"));
+                        } else {
+                          likeMessage = "";
+                          unlikePost(widget.postId, box.get("username"));
+                        }
                       });
-                      // // Update likes status in your database or wherever you store likes
-                      // updateLikes(isLiked, widget.postId);
                     },
                   ),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 14.0),
-                    child: Icon(Icons.messenger_outline_rounded, size: 30.0),
+                  GestureDetector(
+                    onTap: () async {
+                      final box = await Hive.openBox("myBox");
+
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return DraggableBottomSheet(
+                            image: "${url.imageUrl}/${box.get("image")}",
+                          );
+                        },
+                      );
+                    },
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 14.0),
+                      child: Icon(Icons.messenger_outline_rounded, size: 30.0),
+                    ),
                   ),
                   Icon(Icons.send_rounded, size: 30.0),
                 ],
@@ -150,50 +189,33 @@ class _UserPostsState extends State<UserPosts> {
           ),
         ),
 
-// COMMENTS
-        Padding(
-          padding: const EdgeInsets.only(left: 16.0),
-          child: Row(
-            children: [
-              isLiked
-                  ? Text(
-                      "You Liked this post",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    )
-                  : Text("Liked by "),
-              isLiked
-                  ? SizedBox()
-                  : Text(
-                      "Yskaela ",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-              likeCount <= 1
-                  ? Text("")
-                  : Text(
-                      "You and ",
-                    ),
-              likeCount <= 1
-                  ? const SizedBox()
-                  : Text(
-                      " ${likeCount} others",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-            ],
+        // Liked
+        if (isLiked || likeCount > 0)
+          Padding(
+            padding: const EdgeInsets.only(left: 16.0),
+            child: Row(
+              children: [
+                Text(
+                  likeMessage,
+                  style: const TextStyle(
+                      fontSize: 13.0, fontWeight: FontWeight.bold),
+                )
+              ],
+            ),
           ),
-        ),
 
         // CAPTION
         Padding(
           padding: const EdgeInsets.only(left: 16.0, top: 8.0, bottom: 17.0),
           child: RichText(
             text: TextSpan(
-              style: TextStyle(color: Colors.black),
+              style: const TextStyle(color: Colors.black),
               children: [
                 TextSpan(
                   text: widget.name,
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
-                TextSpan(text: " "),
+                const TextSpan(text: " "),
                 TextSpan(text: widget.postCaption)
               ],
             ),

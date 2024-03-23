@@ -17,17 +17,6 @@ class _HomeState extends State<Home> {
   List<dynamic> followers = [];
   List<dynamic> posts_list = [];
 
-  final people = [
-    "Paul Sho",
-    "Yskaela",
-    "Chinachi",
-    "JillyAce",
-    "Flare",
-    "Christine Co",
-    "Danielle Marsh",
-    "Hanni Pham",
-    "Minji Kim",
-  ];
 
   final sessionChecker = SessionChecker();
 
@@ -65,7 +54,7 @@ class _HomeState extends State<Home> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
+            const Text(
               "Sheeshable",
               style: TextStyle(fontFamily: "FSP-BOLD", fontSize: 30),
             ),
