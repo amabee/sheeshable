@@ -56,6 +56,14 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet> {
                   return Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (snapshot.data!.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      "No Comments Yet!",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 17.0),
+                    ),
+                  );
                 } else {
                   List<dynamic> comments = snapshot.data ?? [];
                   return SingleChildScrollView(
