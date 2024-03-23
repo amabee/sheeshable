@@ -4,10 +4,8 @@ import 'package:http/http.dart' as http;
 import 'package:sheeshable/utils/url.dart';
 
 URL url = URL();
-Future<Map<String, dynamic>?> getComments(int postId) async {
-  final Map<String, dynamic> jsonData = {
-    "post_id": postId
-  };
+Future<List<dynamic>> getComments(int postId) async {
+  final Map<String, dynamic> jsonData = {"post_id": postId};
   final Map<String, dynamic> queryParameters = {
     "operation": "getcomments",
     "json": jsonEncode(jsonData),
@@ -19,19 +17,19 @@ Future<Map<String, dynamic>?> getComments(int postId) async {
     if (response.statusCode == 200) {
       dynamic responseData = jsonDecode(response.body);
       if (responseData is List) {
-        return responseData.isNotEmpty ? responseData.first : null;
-      } else if (responseData is Map<String, dynamic>) {
-        return responseData;
+        print(responseData);
+        return responseData.isNotEmpty ? responseData : [];
       } else {
         print("Invalid response format");
-        return null;
+        return [];
       }
     } else {
       print("Error: ${response.statusCode}");
-      return null;
+      return [];
     }
   } catch (error) {
     print("Runtime Error: $error\nResponse: ${response.body}");
-    return null;
+    return [];
   }
 }
+

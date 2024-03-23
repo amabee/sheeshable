@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:sheeshable/functions/comments_controller.dart';
 import 'package:sheeshable/functions/likes_controller.dart';
 import 'package:sheeshable/models/LikedPost.dart';
 import 'package:sheeshable/utils/bottom_modal_sheet.dart';
@@ -172,6 +173,7 @@ class _UserPostsState extends State<UserPosts> {
                         builder: (BuildContext context) {
                           return DraggableBottomSheet(
                             image: "${url.imageUrl}/${box.get("image")}",
+                            pid: widget.postId,
                           );
                         },
                       );
