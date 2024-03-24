@@ -183,7 +183,7 @@ class _UserPostsState extends State<UserPosts> {
                       child: Icon(Icons.messenger_outline_rounded, size: 30.0),
                     ),
                   ),
-                  Icon(Icons.send_rounded, size: 30.0),
+                  //Icon(Icons.send_rounded, size: 30.0),
                 ],
               ),
               Icon(Icons.bookmark_outline_rounded, size: 30.0)

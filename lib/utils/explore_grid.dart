@@ -5,19 +5,26 @@ class ExploreGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SliverToBoxAdapter(
-      child: GridView.builder(
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        itemCount: 20,
-        gridDelegate:
-            SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.all(1.0),
-            child: Container(color: Colors.grey[200]),
+    return SliverGrid(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        mainAxisSpacing: 1.0,
+        crossAxisSpacing: 1.0,
+        childAspectRatio: 1.0,
+      ),
+      delegate: SliverChildBuilderDelegate(
+        (BuildContext context, int index) {
+          return Container(
+            color: Colors.grey[200],
+            child: Center(
+              child: Text(
+                'Item $index',
+                style: TextStyle(fontSize: 16.0),
+              ),
+            ),
           );
         },
+        childCount: 20,
       ),
     );
   }

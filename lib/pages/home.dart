@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:sheeshable/functions/comments_controller.dart';
 import 'package:sheeshable/functions/retrieveHomeData_controller.dart';
 import 'package:sheeshable/utils/bubble_stories.dart';
 import 'package:sheeshable/utils/user_posts.dart';
@@ -15,11 +16,10 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   List<dynamic> followers = [];
-  List<dynamic> posts_list = [];
-
 
   final sessionChecker = SessionChecker();
-
+  String username = "";
+  String myImage = "";
   @override
   void initState() {
     sessionChecker.checkSession();
@@ -32,16 +32,20 @@ class _HomeState extends State<Home> {
     super.didChangeDependencies();
   }
 
-  var uname = "";
   void _initHive() async {
     final box = await Hive.openBox('myBox');
     final myFollowers = await getFollowers(box.get("username"));
-    final getPost = await getPosts(box.get("username"));
     setState(() {
       followers = myFollowers;
-      posts_list = getPost;
-      uname = box.get("username");
+      username = box.get("username");
+      myImage = box.get("image");
     });
+  }
+
+  Future<List<dynamic>> _fetchPosts() async {
+    final box = await Hive.openBox('myBox');
+    final getPost = await getPosts(box.get("username"), box.get("username"));
+    return getPost;
   }
 
   @override
@@ -64,7 +68,7 @@ class _HomeState extends State<Home> {
                   child: Icon(Icons.favorite_border),
                   onTap: () async {
                     final box = await Hive.openBox('myBox');
-                    getPosts(box.get("username"));
+                    getPosts(box.get("username"), "");
                   },
                 ),
                 Padding(padding: const EdgeInsets.all(7.0)),
@@ -92,34 +96,48 @@ class _HomeState extends State<Home> {
           const Divider(),
           Expanded(
             child: FutureBuilder(
-              future: getPosts(uname),
-              builder: (context, snapshot) {
+              future: _fetchPosts(),
+              builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
+                  return Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
                 } else {
+                  List<dynamic> posts_list = snapshot.data ?? [];
                   posts_list.sort((a, b) => DateTime.parse(b["date_posted"])
                       .compareTo(DateTime.parse(a["date_posted"])));
 
                   return ListView.builder(
                     itemCount: posts_list.length,
                     itemBuilder: (context, index) {
-                      final postImage = snapshot.data != null
-                          ? snapshot.data![index]["image"]
-                          : "";
-                      final followerIndex = followers.indexWhere((follower) =>
-                          follower["following_id"] ==
-                          posts_list[index]["following_id"]);
-                      if (followerIndex != -1) {
+                      final postImage = posts_list[index]["image"];
+                      final followingId = posts_list[index]["following_id"];
+                      final isMyPost = followingId == username;
+
+                      if (isMyPost) {
+                        // Handle displaying your own post differently
                         return UserPosts(
-                            name: "@${posts_list[index]["following_id"]}",
+                          name: "@$followingId",
+                          profileImage: myImage,
+                          postImage: postImage,
+                          postId: posts_list[index]["post_id"],
+                          postCaption: posts_list[index]["caption"],
+                        );
+                      } else {
+                        // Handle displaying other users' posts
+                        final followerIndex = followers.indexWhere((follower) =>
+                            follower["following_id"] == followingId);
+                        if (followerIndex != -1) {
+                          return UserPosts(
+                            name: "@$followingId",
                             profileImage: followers[followerIndex]["image"],
                             postImage: postImage,
                             postId: posts_list[index]["post_id"],
-                            postCaption: posts_list[index]["caption"]);
-                      } else {
-                        return Container();
+                            postCaption: posts_list[index]["caption"],
+                          );
+                        } else {
+                          return Container();
+                        }
                       }
                     },
                   );

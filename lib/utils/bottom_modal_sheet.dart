@@ -22,9 +22,18 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet> {
   }
 
   void getAllComments() async {
-    await getComments(widget.pid);
+    List<dynamic> fetchedComments = await getComments(widget.pid);
+    setState(() {
+      comments = fetchedComments;
+    });
   }
 
+  void addCommentAndUpdate(String newComment) {
+    addComment(widget.pid, newComment);
+    getAllComments();
+  }
+
+  TextEditingController commentController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -32,17 +41,29 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet> {
       children: <Widget>[
         Container(
           color: Colors.white,
-          height: 50,
+          height: 80,
           child: Center(
-            child: Container(
-              width: 120,
-              margin: const EdgeInsets.only(top: 10, bottom: 10),
-              height: 5,
-              decoration: const BoxDecoration(
-                color: Colors.black45,
-                shape: BoxShape.rectangle,
-                borderRadius: BorderRadius.all(Radius.circular(8.0)),
-              ),
+            child: Column(
+              children: [
+                Container(
+                  width: 30,
+                  margin: const EdgeInsets.only(top: 10, bottom: 10),
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                  ),
+                ),
+                const SizedBox(
+                  height: 5,
+                ),
+                const Center(
+                    child: Text(
+                  "Comments",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
+                ))
+              ],
             ),
           ),
         ),
@@ -58,10 +79,19 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet> {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else if (snapshot.data!.isEmpty) {
                   return const Center(
-                    child: Text(
-                      "No Comments Yet!",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 17.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "No comments yet.",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 20.0),
+                        ),
+                        Text(
+                          "Start the conversation.",
+                          style: TextStyle(fontSize: 14.0),
+                        ),
+                      ],
                     ),
                   );
                 } else {
@@ -98,6 +128,7 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet> {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12.0),
                     child: TextField(
+                      controller: commentController,
                       decoration: InputDecoration(
                         hintText: 'Comment...',
                         border: OutlineInputBorder(
@@ -113,7 +144,12 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet> {
                             IconButton(
                               icon: Icon(Icons.send),
                               onPressed: () {
-                                print("Sent");
+                                if (commentController.text.length > 5) {
+                                  addCommentAndUpdate(commentController.text);
+                                  commentController.clear();
+                                } else {
+                                  print("Invalid Length");
+                                }
                               },
                             ),
                           ],
@@ -212,11 +248,6 @@ class _InstagramCommentCardState extends State<InstagramCommentCard> {
                         ),
                       ),
                       const SizedBox(width: 8.0),
-                      const Icon(
-                        Icons.reply,
-                        size: 18.0,
-                        color: Colors.grey,
-                      ),
                     ],
                   ),
                 ],

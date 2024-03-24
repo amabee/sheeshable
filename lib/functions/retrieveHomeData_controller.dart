@@ -4,11 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:sheeshable/utils/url.dart';
 
-Future<List> getPosts(String follower_id) async {
+Future<List> getPosts(String follower_id, String user) async {
   try {
     URL url = URL();
     final Map<String, dynamic> jsonData = {
       "follower_id": follower_id,
+      "user_id": user
     };
     final Map<String, dynamic> queryParams = {
       "operation": "getPosts",
@@ -20,7 +21,7 @@ Future<List> getPosts(String follower_id) async {
     if (response.statusCode == 200) {
       var result = jsonDecode(response.body);
       if (result is List && result.isNotEmpty) {
-        // print("Result: $result");
+        //  print("Result: $result");
         return result;
       } else {
         //print("Error Retrieving Posts: ${response.body}");
