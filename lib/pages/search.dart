@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:sheeshable/functions/searchUser_controller.dart';
 import 'package:sheeshable/utils/explore_grid.dart';
 
 class SearchPage extends StatefulWidget {
@@ -10,6 +13,7 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   String searchText = '';
+  List<dynamic> searchedPeople = [];
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +44,12 @@ class _SearchPageState extends State<SearchPage> {
                           onChanged: (value) {
                             setState(() {
                               searchText = value;
+                              // Call getSearchedPerson and store the result
+                              getSearchedPerson(value).then((result) {
+                                setState(() {
+                                  searchedPeople = result;
+                                });
+                              });
                             });
                           },
                           decoration: InputDecoration(
@@ -58,9 +68,61 @@ class _SearchPageState extends State<SearchPage> {
           ),
           if (searchText.isEmpty)
             const ExploreGrid()
-          else
-            SliverToBoxAdapter(
-              child: UserCard(searchText: searchText),
+          else if (searchedPeople.isNotEmpty)
+            SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  final Map<String, dynamic> personData = searchedPeople[index];
+                  final String username = personData['username'] ?? 'Username';
+                  final String fullName = personData['fullname'] ?? 'Full Name';
+                  final String image = personData['image'] ?? 'Image';
+                  return Container(
+                    padding:
+                        EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                    color: Colors.white,
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        backgroundImage: NetworkImage("${url.imageUrl}/$image"),
+                        foregroundImage: NetworkImage("${url.imageUrl}/$image"),
+                      ),
+                      title: Text(
+                        username,
+                        style: const TextStyle(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      subtitle: Text(
+                        fullName,
+                        style: const TextStyle(
+                          fontSize: 14.0,
+                        ),
+                      ),
+                      trailing: ElevatedButton(
+                        onPressed: () {
+                          print("SHiT");
+                        },
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.blue,
+                          elevation: 0,
+                          padding: EdgeInsets.symmetric(horizontal: 16.0),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                        ),
+                        child: const Text(
+                          'Follow',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                      onTap: () {
+                        // Add functionality here
+                      },
+                    ),
+                  );
+                },
+                childCount: searchedPeople.length,
+              ),
             ),
         ],
       ),
@@ -68,59 +130,65 @@ class _SearchPageState extends State<SearchPage> {
   }
 }
 
-class UserCard extends StatelessWidget {
-  final String searchText;
+// class UserCard extends StatelessWidget {
+//   final List<dynamic> searchResults;
 
-  const UserCard({required this.searchText, Key? key}) : super(key: key);
+//   const UserCard({required this.searchResults, Key? key}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-      color: Colors.white,
-      child: ListTile(
-        leading: CircleAvatar(
-          // You can replace this with the actual user's profile picture
-          backgroundColor: Colors.grey,
-          child: Icon(
-            Icons.person,
-            color: Colors.white,
-          ),
-        ),
-        title: Text(
-          'Username',
-          style: TextStyle(
-            fontSize: 16.0,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        subtitle: Text(
-          'Full Name',
-          style: TextStyle(
-            fontSize: 14.0,
-          ),
-        ),
-        trailing: ElevatedButton(
-          onPressed: () {
-            // Add functionality here
-          },
-          child: Text(
-            'Follow',
-            style: TextStyle(color: Colors.white),
-          ),
-          style: ElevatedButton.styleFrom(
-            primary: Colors.blue,
-            elevation: 0,
-            padding: EdgeInsets.symmetric(horizontal: 16.0),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20.0),
-            ),
-          ),
-        ),
-        onTap: () {
-          // Add functionality here
-        },
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return ListView.builder(
+//       itemCount: searchResults.length,
+//       itemBuilder: (context, index) {
+//         final Map<String, dynamic> personData = searchResults[index];
+//         final String username = personData['username'] ?? 'Username';
+//         final String fullName = personData['fullname'] ?? 'Full Name';
+//         final String image = personData['image'] ?? 'Image';
+
+//         return Container(
+//           padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+//           color: Colors.white,
+//           child: ListTile(
+//             leading: CircleAvatar(
+//               backgroundImage: NetworkImage("${url.imageUrl}/$image"),
+//               foregroundImage: NetworkImage("${url.imageUrl}/$image"),
+//             ),
+//             title: Text(
+//               username,
+//               style: const TextStyle(
+//                 fontSize: 16.0,
+//                 fontWeight: FontWeight.bold,
+//               ),
+//             ),
+//             subtitle: Text(
+//               fullName,
+//               style: const TextStyle(
+//                 fontSize: 14.0,
+//               ),
+//             ),
+//             trailing: ElevatedButton(
+//               onPressed: () {
+//                 // Add functionality here
+//               },
+//               style: ElevatedButton.styleFrom(
+//                 primary: Colors.blue,
+//                 elevation: 0,
+//                 padding: EdgeInsets.symmetric(horizontal: 16.0),
+//                 shape: RoundedRectangleBorder(
+//                   borderRadius: BorderRadius.circular(20.0),
+//                 ),
+//               ),
+//               child: const Text(
+//                 'Follow',
+//                 style: TextStyle(color: Colors.white),
+//               ),
+//             ),
+//             onTap: () {
+//               // Add functionality here
+//             },
+//           ),
+//         );
+//       },
+//     );
+//   }
+// }

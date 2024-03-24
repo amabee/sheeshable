@@ -17,11 +17,13 @@ Future<List<dynamic>> getSearchedPerson(String sid) async {
 
   try {
     if (response.statusCode == 200) {
-      dynamic responseData = jsonDecode(response.body);
+      String jsonString = response.body.replaceAll("'", '"');
+      dynamic responseData = jsonDecode(jsonString);
       if (responseData is List) {
-        //print(responseData);
+        print(responseData);
         return responseData.isNotEmpty ? responseData : [];
       } else {
+        print(responseData);
         print("Invalid response format");
         return [];
       }
