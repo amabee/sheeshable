@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:sheeshable/functions/authentication_controller.dart';
+import 'package:sheeshable/functions/follow_controller.dart';
+import 'package:sheeshable/functions/profilePage_details.dart';
 import 'package:sheeshable/utils/url.dart';
 
 class ProfileHeaderWidget extends StatefulWidget {
@@ -17,6 +19,11 @@ class ProfileHeaderWidget extends StatefulWidget {
 
 class _ProfileHeaderWidgetState extends State<ProfileHeaderWidget> {
   bool isMe = false;
+  int followersCount = 0;
+  int followingCount = 0;
+  int postscount = 0;
+  int isfollow = 0;
+  bool displayFollow = true;
 
   void isMeRightNow(String username) async {
     final box = await Hive.openBox("myBox");
@@ -37,6 +44,33 @@ class _ProfileHeaderWidgetState extends State<ProfileHeaderWidget> {
   void initState() {
     super.initState();
     isMeRightNow(widget.username);
+    getFollowers();
+    followCheck();
+  }
+
+  void getFollowers() async {
+    int followers = await getFollowerCount(widget.username);
+    int following = await getFollowingCount(widget.username);
+    int postcount = await getPostsCount(widget.username);
+    setState(() {
+      followersCount = followers;
+      followingCount = following;
+      postscount = postcount;
+    });
+  }
+
+  void followCheck() async {
+    int followchecker = await isFollowing(widget.username);
+
+    if (followchecker == 1) {
+      setState(() {
+        displayFollow = false;
+      });
+    } else {
+      setState(() {
+        displayFollow = true;
+      });
+    }
   }
 
   @override
@@ -62,18 +96,18 @@ class _ProfileHeaderWidgetState extends State<ProfileHeaderWidget> {
                   backgroundImage:
                       NetworkImage("${url.imageUrl}/${widget.imageLink}"),
                 ),
-                const Row(
+                Row(
                   children: [
                     Column(
                       children: [
                         Text(
-                          "0",
-                          style: TextStyle(
+                          "$postscount",
+                          style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
-                        Text(
+                        const Text(
                           "Posts",
                           style: TextStyle(
                             fontSize: 15,
@@ -82,13 +116,13 @@ class _ProfileHeaderWidgetState extends State<ProfileHeaderWidget> {
                         )
                       ],
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 30,
                     ),
                     Column(
                       children: [
                         Text(
-                          "0",
+                          "$followersCount",
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
@@ -109,7 +143,7 @@ class _ProfileHeaderWidgetState extends State<ProfileHeaderWidget> {
                     Column(
                       children: [
                         Text(
-                          "0",
+                          "$followingCount", // Display following count
                           style: TextStyle(
                             letterSpacing: 0.4,
                             fontSize: 15,
@@ -174,18 +208,38 @@ class _ProfileHeaderWidgetState extends State<ProfileHeaderWidget> {
           child: OutlinedButton(
             style: OutlinedButton.styleFrom(
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                minimumSize: Size(0, 30),
+                minimumSize: const Size(20, 40),
                 side: BorderSide(
-                  color: Colors.grey.shade400,
+                  color: Colors.grey.shade100,
                 ),
                 backgroundColor:
-                    !isMe ? Colors.blue.shade300 : Colors.transparent),
+                    !isMe ? Colors.blue.shade500 : Colors.transparent),
             onPressed: () {},
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 50),
-              child: !isMe
-                  ? Text("Follow", style: TextStyle(color: Colors.black))
-                  : Text("Edit Profile", style: TextStyle(color: Colors.black)),
+              child: !isMe && displayFollow
+                  ? GestureDetector(
+                      onTap: () {
+                        followUser(widget.username);
+                        setState(() {
+                          followingCount++;
+                          displayFollow = false;
+                        });
+                      },
+                      child: const Text(
+                        "Follow",
+                        style: TextStyle(color: Colors.black),
+                      ),
+                    )
+                  : !isMe && !displayFollow
+                      ? const Text(
+                          "Following",
+                          style: TextStyle(color: Colors.black),
+                        )
+                      : const Text(
+                          "Edit Profile",
+                          style: TextStyle(color: Colors.black),
+                        ),
             ),
           ),
         ),

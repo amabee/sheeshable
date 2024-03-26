@@ -16,8 +16,6 @@ class ProfileBaseScreen extends StatefulWidget {
 }
 
 class _ProfileBaseScreenState extends State<ProfileBaseScreen> {
- 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -120,7 +118,7 @@ class _ProfileBaseScreenState extends State<ProfileBaseScreen> {
               Expanded(
                 child: TabBarView(
                   children: [
-                    Gallery(),
+                    Gallery(username: widget.username),
                     Center(child: CircularProgressIndicator()),
                     Center(child: CircularProgressIndicator()),
                   ],

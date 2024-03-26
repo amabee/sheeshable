@@ -1,31 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:sheeshable/functions/authentication_controller.dart';
+import 'package:sheeshable/functions/retrieveAllPosts_byUserController.dart';
 
 class Gallery extends StatefulWidget {
+  String username;
+
+  Gallery({Key? key, required this.username});
   @override
   _GalleryState createState() => _GalleryState();
 }
 
 class _GalleryState extends State<Gallery> {
   late OverlayEntry _popupDialog;
-  List<String> imageUrls = [
-    'https://placeimg.com/640/480/animals',
-    'https://placeimg.com/640/480/arch',
-    'https://placeimg.com/640/480/nature',
-    'https://placeimg.com/640/480/people',
-    'https://placeimg.com/640/480/tech',
-    'https://placeimg.com/640/480/animals',
-    'https://placeimg.com/640/480/arch',
-    'https://placeimg.com/640/480/nature',
-    'https://placeimg.com/640/480/people',
-    'https://placeimg.com/640/480/tech',
-    'https://placeimg.com/640/480/nature',
-    'https://placeimg.com/640/480/people',
-    'https://placeimg.com/640/480/tech',
-    'https://placeimg.com/640/480/animals',
-    'https://placeimg.com/640/480/arch',
-    'https://placeimg.com/640/480/nature',
-    'https://placeimg.com/640/480/people',
-  ];
+  List<String> imageUrls = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchImageUrls();
+  }
+
+  void fetchImageUrls() async {
+    List<dynamic> dynamicUrls = await getImagePosts(widget.username);
+    List<String> urls = dynamicUrls.map((dynamic url) {
+      String decodedUrl =
+          Uri.decodeFull(url.toString()).replaceAll(RegExp('[{}%]'), '').trim();
+      String imageName = decodedUrl.split(':').last.trim();
+      return "http://192.168.1.3/sheeshable/uploaded_images/$imageName";
+    }).toList();
+    print(urls);
+    setState(() {
+      imageUrls = urls;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +52,10 @@ class _GalleryState extends State<Gallery> {
             Overlay.of(context).insert(_popupDialog);
           },
           onLongPressEnd: (details) => _popupDialog?.remove(),
-          child: Image.network(url, fit: BoxFit.cover),
+          child: Image.network(
+            url,
+            fit: BoxFit.cover,
+          ),
         ),
       );
 
@@ -62,7 +72,7 @@ class _GalleryState extends State<Gallery> {
       color: Colors.white,
       child: ListTile(
         leading: CircleAvatar(
-          backgroundImage: NetworkImage('https://placeimg.com/640/480/people'),
+          backgroundImage: NetworkImage("${url.imageUrl}/$imageUrls"),
         ),
         title: Text(
           'john.doe',
