@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:sheeshable/functions/searchUser_controller.dart';
+import 'package:sheeshable/pages/profile_page.dart';
 import 'package:sheeshable/utils/explore_grid.dart';
 
 class SearchPage extends StatefulWidget {
@@ -98,25 +99,14 @@ class _SearchPageState extends State<SearchPage> {
                           fontSize: 14.0,
                         ),
                       ),
-                      trailing: ElevatedButton(
-                        onPressed: () {
-                          print("SHiT");
-                        },
-                        style: ElevatedButton.styleFrom(
-                          primary: Colors.blue,
-                          elevation: 0,
-                          padding: EdgeInsets.symmetric(horizontal: 16.0),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20.0),
-                          ),
-                        ),
-                        child: const Text(
-                          'Follow',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
                       onTap: () {
-                        // Add functionality here
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ProfileBaseScreen(
+                                      username: username,
+                                      imageLink: image,
+                                    )));
                       },
                     ),
                   );
@@ -129,66 +119,3 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 }
-
-// class UserCard extends StatelessWidget {
-//   final List<dynamic> searchResults;
-
-//   const UserCard({required this.searchResults, Key? key}) : super(key: key);
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return ListView.builder(
-//       itemCount: searchResults.length,
-//       itemBuilder: (context, index) {
-//         final Map<String, dynamic> personData = searchResults[index];
-//         final String username = personData['username'] ?? 'Username';
-//         final String fullName = personData['fullname'] ?? 'Full Name';
-//         final String image = personData['image'] ?? 'Image';
-
-//         return Container(
-//           padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-//           color: Colors.white,
-//           child: ListTile(
-//             leading: CircleAvatar(
-//               backgroundImage: NetworkImage("${url.imageUrl}/$image"),
-//               foregroundImage: NetworkImage("${url.imageUrl}/$image"),
-//             ),
-//             title: Text(
-//               username,
-//               style: const TextStyle(
-//                 fontSize: 16.0,
-//                 fontWeight: FontWeight.bold,
-//               ),
-//             ),
-//             subtitle: Text(
-//               fullName,
-//               style: const TextStyle(
-//                 fontSize: 14.0,
-//               ),
-//             ),
-//             trailing: ElevatedButton(
-//               onPressed: () {
-//                 // Add functionality here
-//               },
-//               style: ElevatedButton.styleFrom(
-//                 primary: Colors.blue,
-//                 elevation: 0,
-//                 padding: EdgeInsets.symmetric(horizontal: 16.0),
-//                 shape: RoundedRectangleBorder(
-//                   borderRadius: BorderRadius.circular(20.0),
-//                 ),
-//               ),
-//               child: const Text(
-//                 'Follow',
-//                 style: TextStyle(color: Colors.white),
-//               ),
-//             ),
-//             onTap: () {
-//               // Add functionality here
-//             },
-//           ),
-//         );
-//       },
-//     );
-//   }
-// }

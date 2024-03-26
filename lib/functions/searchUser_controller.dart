@@ -20,10 +20,10 @@ Future<List<dynamic>> getSearchedPerson(String sid) async {
       String jsonString = response.body.replaceAll("'", '"');
       dynamic responseData = jsonDecode(jsonString);
       if (responseData is List) {
-        print(responseData);
+        //print(responseData);
         return responseData.isNotEmpty ? responseData : [];
       } else {
-        print(responseData);
+        //print(responseData);
         print("Invalid response format");
         return [];
       }
