@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sheeshable/pages/addpost_screen.dart';
 import 'package:sheeshable/pages/home.dart';
 import 'package:sheeshable/pages/search.dart';
 
@@ -15,9 +16,7 @@ class _HomePageState extends State<HomePage> {
   final List<Widget> _childrenPage = [
     Home(),
     SearchPage(),
-    Center(
-      child: Text("New Post"),
-    ),
+    ImagePickerDemo(),
     Center(
       child: Text("Reels"),
     ),
